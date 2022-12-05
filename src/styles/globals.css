@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.rdp-months {
+  justify-content: center;
+}
+.rdp {
+  margin-left: -5px;
+  margin-top: -5px;
+}
+
+:root {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: #ee6055;
+  --rdp-background-color: #e7edff;
+  /* Switch to dark colors for dark themes */
+  --rdp-accent-color-dark: #ee6055;
+  --rdp-background-color-dark: hsl(252, 96%, 22%);
+  /* Outline border for focused elements */
+  --rdp-outline: 2px solid var(--rdp-accent-color);
+  /* Outline border for focused and selected elements */
+  --rdp-outline-selected: 2px solid hsl(4, 82%, 75%);
+}
+
+body,
+html {
+  @apply text-blue;
+}
+
+.filter-btn input:checked ~ span {
+  background-color: #0c0d3b;
+  color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .res-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 40px;
+  }
+  .rdp-months {
+    justify-content: left;
+  }
+}

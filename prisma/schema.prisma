@@ -67,30 +67,28 @@ model VerificationToken {
 }
 
 model Resource {
-  id String @id @default(cuid())
-	mainImage String
-	slug String
-	title String
-	type String
-
-	tags Tag[]
-	reservation Reservation @relation(fields: [reservationId], references: [id]) 
-	reservationId String
+  id 						String @id @default(cuid())
+	mainImage 		String
+	title 				String
+	type 					String
+	reservationId String?
+	tags 					Tag[]
+	reservations	Reservation[]
 }
 
-
 model Tag {
-	id String @id @default(cuid())
-	tag String
-	resource Resource @relation(fields: [resourceId], references: [id]) 
-	resourceId String
+	id 					String @id @default(cuid())
+	tag 				String
+	resourceId 	String?
+	resource 		Resource? @relation(fields: [resourceId], references: [id]) 
 }
 
 model Reservation {
-	id String @id @default(cuid())
-	startDate DateTime
-	endDate DateTime
-	resources Resource[]
-  user      User     @relation(fields: [userId], references: [id])
-	userId String
+	id 					String @id @default(cuid())
+	startDate 	String
+	endDate 		String
+	userId 			String
+	resourceId	String?
+	resource 		Resource? @relation(fields: [resourceId], references: [id]) 
+  user      	User     @relation(fields: [userId], references: [id])
 }
