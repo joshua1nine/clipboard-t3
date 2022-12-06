@@ -73,6 +73,7 @@ const Home: NextPage = () => {
           </section>
         </main>
       </div>
+      
     </>
   );
 };
