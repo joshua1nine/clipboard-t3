@@ -7,7 +7,7 @@ import { Card } from '../components/Card';
 import { useState } from 'react';
 import { applyFilters } from '../utils/applyFilters';
 import { FilterOverlay } from '../components/FilterOverlay';
-import { SearchBar } from '../components/SearchBar';
+import { SearchBar } from '@components/SearchBar';
 
 const Home: NextPage = () => {
   const { data: resources, isLoading } = trpc.resource.getAll.useQuery();

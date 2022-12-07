@@ -1,15 +1,17 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { trpc } from 'src/utils/trpc';
-import { CldUploadButton } from 'next-cloudinary';
+import { CldUploadButton, CldImage } from 'next-cloudinary';
 
 const Create = () => {
   const [mainImage, setMainImage] = useState('');
-  console.log(mainImage);
+  const [cloudinaryRes, setCloudinaryRes] = useState({});
+  const [previewUrl, setPreviewUrl] = useState('');
+
+  console.log(cloudinaryRes);
   const [title, setTitle] = useState('');
   const [type, setType] = useState('');
   const [tags, setTags] = useState([]);
-
   const addResource = trpc.resource.add.useMutation();
   const router = useRouter();
 
@@ -49,6 +51,8 @@ const Create = () => {
           <CldUploadButton
             onUpload={(error: any, result: any, widget: any) => {
               setMainImage(result?.info?.public_id); // Updating local state with asset details
+              setPreviewUrl(result?.info?.thumbnail_url);
+              setCloudinaryRes(result); // Updating local state with asset details
               widget.close(); // Close widget immediately after successful upload
               console.log(error);
             }}
@@ -56,6 +60,14 @@ const Create = () => {
           >
             Upload to Cloudinary
           </CldUploadButton>
+          {previewUrl != '' && (
+            <CldImage
+              src={previewUrl}
+              width='400'
+              height='400'
+              alt='resource upload'
+            />
+          )}
         </div>
         <input
           type='submit'
