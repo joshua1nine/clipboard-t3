@@ -17,6 +17,7 @@
     "@trpc/next": "^10.0.0",
     "@trpc/react-query": "^10.0.0",
     "@trpc/server": "^10.0.0",
+    "cloudinary": "^1.32.0",
     "date-fns": "^2.29.3",
     "fuse.js": "^6.6.2",
     "next": "13.0.2",

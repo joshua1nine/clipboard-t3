@@ -1,13 +1,21 @@
-import { type inferAsyncReturnType } from "@trpc/server";
-import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { type Session } from "next-auth";
+import { type inferAsyncReturnType } from '@trpc/server';
+import { type CreateNextContextOptions } from '@trpc/server/adapters/next';
+import { type Session } from 'next-auth';
 
-import { getServerAuthSession } from "../common/get-server-auth-session";
-import { prisma } from "../db/client";
+import { getServerAuthSession } from '../common/get-server-auth-session';
+import { prisma } from '../db/client';
+import { v2 as cloudinary } from 'cloudinary';
 
 type CreateContextOptions = {
-  session: Session | null;
+   session: Session | null;
 };
+
+cloudinary.config({
+   cloud_name: 'bearedweb',
+   api_key: '141286935378877',
+   api_secret: '1YVT4PluNep2fOmi0e2365vHhh4',
+   secure: true,
+});
 
 /** Use this helper for:
  * - testing, so we dont have to mock Next.js' req/res
@@ -15,10 +23,11 @@ type CreateContextOptions = {
  * @see https://create.t3.gg/en/usage/trpc#-servertrpccontextts
  **/
 export const createContextInner = async (opts: CreateContextOptions) => {
-  return {
-    session: opts.session,
-    prisma,
-  };
+   return {
+      session: opts.session,
+      prisma,
+      cloudinary,
+   };
 };
 
 /**
@@ -26,14 +35,14 @@ export const createContextInner = async (opts: CreateContextOptions) => {
  * @link https://trpc.io/docs/context
  **/
 export const createContext = async (opts: CreateNextContextOptions) => {
-  const { req, res } = opts;
+   const { req, res } = opts;
 
-  // Get the session from the server using the unstable_getServerSession wrapper function
-  const session = await getServerAuthSession({ req, res });
+   // Get the session from the server using the unstable_getServerSession wrapper function
+   const session = await getServerAuthSession({ req, res });
 
-  return await createContextInner({
-    session,
-  });
+   return await createContextInner({
+      session,
+   });
 };
 
 export type Context = inferAsyncReturnType<typeof createContext>;
