@@ -80,7 +80,7 @@ model Tag {
 	id 					String @id @default(cuid())
 	tag 				String
 	resourceId 	String?
-	resource 		Resource? @relation(fields: [resourceId], references: [id]) 
+	resource 		Resource @relation(fields: [resourceId], references: [id]) 
 }
 
 model Reservation {
