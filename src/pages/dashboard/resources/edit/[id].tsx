@@ -3,28 +3,65 @@ import { useState } from 'react';
 import { trpc } from 'src/utils/trpc';
 import { CldUploadButton, CldImage } from 'next-cloudinary';
 import { FaWindowClose } from 'react-icons/fa';
+import { Tag } from '@prisma/client';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { createProxySSGHelpers } from '@trpc/react-query/ssg';
+import { appRouter } from 'src/server/trpc/router/_app';
+import { createContextInner } from 'src/server/trpc/context';
+import superjson from 'superjson';
 
-const Create = () => {
-   const [mainImage, setMainImage] = useState('');
-   const [cloudRes, setCloudRes] = useState<any>({});
-   const [previewUrl, setPreviewUrl] = useState('');
-   const [title, setTitle] = useState('');
-   const [type, setType] = useState('ELA');
-   const [resourceTags, setResourceTags] = useState<{ id: string }[]>([]);
+export async function getServerSideProps(
+   context: GetServerSidePropsContext<{ id: string }>
+) {
+   const ssg = createProxySSGHelpers({
+      router: appRouter,
+      ctx: await createContextInner({ session: null }),
+      transformer: superjson, // optional - adds superjson serialization
+   });
 
-   // Server Side Actions
-   const { data: tags } = trpc.tag.getAll.useQuery();
-   const addResource = trpc.resource.add.useMutation();
-   const deleteImage = trpc.cloudinary.deleteImage.useMutation();
+   const id = context?.query?.id as string;
+   const resource = await ssg.resource.getById.fetch({ id });
+   const tags = await ssg.tag.getAll.fetch();
 
+   // Make sure to return { props: { trpcState: ssg.dehydrate() } }
+   return {
+      props: {
+         trpcState: ssg.dehydrate(),
+         id,
+         resource,
+         tags,
+      },
+   };
+}
+
+const Edit = (
+   props: InferGetServerSidePropsType<typeof getServerSideProps>
+) => {
    const router = useRouter();
+   const { resource, tags } = props;
+
+   // State
+   const [mainImage, setMainImage] = useState(resource.mainImage);
+   const [cloudRes, setCloudRes] = useState<any>({});
+   const [previewUrl, setPreviewUrl] = useState(resource.mainImage);
+   const [title, setTitle] = useState(resource.title);
+   const [type, setType] = useState(resource.type);
+   const [resourceTags, setResourceTags] = useState(resource.tags);
+
+   // Helpers
+   const deleteImage = trpc.cloudinary.deleteImage.useMutation();
+   const updateResource = trpc.resource.update.useMutation();
+
+   function isChecked(tag: Tag) {
+      return resourceTags?.some((r) => r.id == tag.id);
+   }
 
    function handleTagChange(e: any) {
       const box = e.target;
       if (box.checked) {
          setResourceTags((current: any) => [...current, { id: box.value }]);
       } else {
-         setResourceTags(resourceTags.filter((f: any) => f.id !== box.value));
+         setResourceTags(resourceTags?.filter((f: any) => f.id !== box.value));
       }
    }
 
@@ -43,10 +80,11 @@ const Create = () => {
 
    async function handleOnSubmit(e: any) {
       e.preventDefault();
-      await addResource.mutateAsync({
-         type,
-         mainImage,
-         title,
+      await updateResource.mutateAsync({
+         id: resource?.id,
+         type: type,
+         mainImage: mainImage,
+         title: title,
          tags: resourceTags,
       });
 
@@ -55,7 +93,7 @@ const Create = () => {
 
    return (
       <main className='mx-auto max-w-4xl p-3'>
-         <h1 className='mb-3 text-2xl'>Create New Resource</h1>
+         <h1 className='mb-3 text-2xl'>{title}</h1>
          <form onSubmit={handleOnSubmit} className='space-y-5'>
             <label htmlFor='name' className='flex flex-col'>
                <span className='mb-2'>Name</span>
@@ -87,10 +125,11 @@ const Create = () => {
                   <div className='relative inline-block'>
                      <CldImage
                         src={previewUrl}
-                        width='400'
-                        height='400'
+                        priority={true}
+                        width={800}
+                        height={800}
                         alt='resource upload'
-                        className='m-auto'
+                        className='m-auto h-auto w-auto'
                      />
                      <button
                         className='absolute top-0 right-0'
@@ -129,6 +168,7 @@ const Create = () => {
                               name={tag.tag}
                               id={tag.tag}
                               value={tag.id}
+                              checked={isChecked(tag)}
                               onChange={handleTagChange}
                            />
                            <span className='inline-block rounded-md border border-blue py-1 px-3'>
@@ -151,4 +191,4 @@ const Create = () => {
    );
 };
 
-export default Create;
+export default Edit;

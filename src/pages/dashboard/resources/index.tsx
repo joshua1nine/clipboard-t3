@@ -84,7 +84,10 @@ const resources = () => {
                               <span>{r.type}</span>
                            </td>
                            <td className='flex space-x-3 p-4 text-center'>
-                              <Link href={`/dashboard/resources/${r.id}`}>
+                              <Link
+                                 prefetch={false}
+                                 href={`resources/edit/${r.id}`}
+                              >
                                  <img
                                     className='h-5 w-5 text-blue'
                                     src='/pen-solid.svg'
