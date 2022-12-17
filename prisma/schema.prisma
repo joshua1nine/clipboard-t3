@@ -55,6 +55,7 @@ model User {
    image         String?
    accounts      Account[]
    sessions      Session[]
+   role          String        @default("USER")
    reservations  Reservation[]
 }
 
@@ -87,7 +88,7 @@ model Reservation {
    startDate  String
    endDate    String
    userId     String
-   resourceId String?
+   resourceId String
    resource   Resource? @relation(fields: [resourceId], references: [id])
    user       User      @relation(fields: [userId], references: [id])
 }

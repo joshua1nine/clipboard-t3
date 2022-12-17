@@ -9,7 +9,8 @@ interface Props {
 }
 
 const Header = ({ title }: Props) => {
-   const { data: sessionData } = useSession();
+   const { data: session } = useSession();
+
    return (
       <>
          <header className='mb-1 flex items-center justify-between p-3'>
@@ -17,7 +18,7 @@ const Header = ({ title }: Props) => {
                <Link href={'/'}>{title}</Link>
             </h1>
             <div className='flex items-center space-x-2'>
-               {sessionData ? (
+               {session?.user?.role == 'ADMIN' ? (
                   <Link href='/dashboard'>
                      <HiCog size={30} className='text-blue' />
                   </Link>

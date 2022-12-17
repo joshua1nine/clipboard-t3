@@ -182,7 +182,7 @@ const Edit = (
             <div className='flex flex-col pt-2'>
                <input
                   type='submit'
-                  value='Create'
+                  value='Update'
                   className='cursor-pointer rounded-md bg-blue py-5 text-white'
                />
             </div>

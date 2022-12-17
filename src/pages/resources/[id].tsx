@@ -19,6 +19,8 @@ const Resource = () => {
    const [name, setName] = useState<string>('');
    const [email, setEmail] = useState<string>('');
 
+   const addReservation = trpc.reservation.add.useMutation();
+
    useEffect(() => {
       setName(sessionData?.user?.name as string);
       setEmail(sessionData?.user?.email as string);
@@ -45,24 +47,15 @@ const Resource = () => {
    }
 
    // ToDo update Make Reservation Api
-   const handleOnSubmit = (e: any) => {
+   async function handleOnSubmit(e: any) {
       e.preventDefault();
-      const formData = {
-         resource: resource?.id,
-         teacher: {
-            name: name,
-            email: email,
-         },
-         date: {
-            to: format(range.to, 'yyyy, MM, dd'),
-            from: format(range.from, 'yyyy, MM, dd'),
-         },
-      };
-      fetch('/api/reservation', {
-         method: 'post',
-         body: JSON.stringify(formData),
+      await addReservation.mutateAsync({
+         userId: sessionData?.user?.id as string,
+         resourceId: id,
+         startDate: format(range.from, 'PPP'),
+         endDate: format(range.to, 'PPP'),
       });
-   };
+   }
 
    if (status !== 'success') {
       return <div>Loading...</div>;
