@@ -1,5 +1,5 @@
-import { type NextPage } from 'next';
 import Head from 'next/head';
+import { type NextPage } from 'next';
 import Fuse from 'fuse.js';
 import { trpc } from '../utils/trpc';
 import Header from '../components/Header';

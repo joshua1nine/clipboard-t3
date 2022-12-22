@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server';
+import { nodeMail } from 'src/utils/nodemailer';
 import { z } from 'zod';
 
 import { router, publicProcedure, protectedProcedure } from '../trpc';
@@ -34,10 +35,11 @@ export const reservationRouter = router({
             endDate: z.string(),
             userId: z.string(),
             resourceId: z.string(),
+            userEmail: z.string().email(),
          })
       )
       .mutation(async ({ input }) => {
-         const reservation = prisma?.reservation.create({
+         const reservation = await prisma?.reservation.create({
             data: {
                userId: input.userId,
                resourceId: input.resourceId,
@@ -45,6 +47,15 @@ export const reservationRouter = router({
                endDate: input.endDate,
             },
          });
+
+         const info = await nodeMail.sendMail({
+            from: '"Clipboard" <info@spsclipboard.com>',
+            to: input.userEmail,
+            subject: 'Reservation Confirmation',
+            html: '<strong>Thank you for your reservation!</strong>',
+            headers: { 'x-myheader': 'test header' },
+         });
+         console.log(info);
          return reservation;
       }),
 });

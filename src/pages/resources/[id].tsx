@@ -16,15 +16,8 @@ const Resource = () => {
 
    // State
    const [range, setRange] = useState<any>();
-   const [name, setName] = useState<string>('');
-   const [email, setEmail] = useState<string>('');
 
    const addReservation = trpc.reservation.add.useMutation();
-
-   useEffect(() => {
-      setName(sessionData?.user?.name as string);
-      setEmail(sessionData?.user?.email as string);
-   }, [sessionData]);
 
    // Date Picker Options
    const disabledDays = resource?.reservations?.map((r: any) => ({
@@ -36,11 +29,11 @@ const Resource = () => {
 
    if (range?.from) {
       if (!range.to) {
-         footer = <p>{format(range.from, 'PPP')}</p>;
+         footer = <p>{format(range.from, 'MMM do')} - <span className='font-bold'>Select last day.</span></p>;
       } else if (range.to) {
          footer = (
             <p>
-               {format(range.from, 'PPP')} - {format(range.to, 'PPP')}
+               {format(range.from, 'MMM do')} - {format(range.to, 'do')}
             </p>
          );
       }
@@ -51,6 +44,7 @@ const Resource = () => {
       e.preventDefault();
       await addReservation.mutateAsync({
          userId: sessionData?.user?.id as string,
+         userEmail: sessionData?.user?.email as string,
          resourceId: id,
          startDate: format(range.from, 'PPP'),
          endDate: format(range.to, 'PPP'),
@@ -111,7 +105,8 @@ const Resource = () => {
                      <input
                         type='submit'
                         value='Reserve'
-                        className='rounded-md bg-blue py-3 px-5 text-white'
+                        disabled={range?.to == undefined ? true : false}
+                        className='cursor-pointer bg-blue py-3 px-5 text-white border border-blue rounded disabled:bg-gray-200 disabled:border-gray-400 disabled:text-gray-400'
                      />
                   </form>
                ) : (
